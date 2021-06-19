@@ -1,2 +1,4 @@
 fastapi>=0.61.1
 uvicorn>=0.12.1
+SQLAlchemy>=1.4.9
+psycopg2>=2.8.6
