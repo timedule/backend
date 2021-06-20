@@ -1,4 +1,5 @@
 import os
+import ast
 from urllib.parse import urlparse
 
 from fastapi import FastAPI, Request, HTTPException
@@ -8,6 +9,7 @@ from fastapi.responses import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 
+import firebase_admin
 import database
 
 app = FastAPI()
@@ -20,6 +22,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+cred_json = ast.literal_eval(os.getenv('FIREBASE_CRED'))
+cred = firebase_admin.credentials.Certificate(cred_json)
+firebase_admin.initialize_app(cred)
 
 
 @app.middleware("http")
