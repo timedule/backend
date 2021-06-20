@@ -1,12 +1,14 @@
 import os
 from urllib.parse import urlparse
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import (
     RedirectResponse,
     Response,
 )
 from fastapi.middleware.cors import CORSMiddleware
+
+import database
 
 app = FastAPI()
 
@@ -39,3 +41,11 @@ async def middleware(request: Request, call_next):
 @app.get("/")
 async def get_root(request: Request):
     return {"message": "hello, world"}
+
+
+@app.get("/table/{id}")
+async def get_table(id):
+    table = database.get_table(id)
+    if not table:
+        raise HTTPException(status_code=404, detail='Not Found')
+    return table
