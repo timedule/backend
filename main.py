@@ -9,10 +9,21 @@ from fastapi.responses import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 
+from pydantic import BaseModel
+
 import firebase_admin
 import firebase_admin.auth
 import firebase_admin._auth_utils
+
 import database
+
+
+class PostData(BaseModel):
+    owner: str
+    title: str
+    main_data: dict
+    template: dict
+
 
 app = FastAPI()
 
@@ -70,3 +81,17 @@ async def get_user(user_id):
             database.delete_user(user_id)
         raise HTTPException(status_code=404, detail='Not Found')
     return user
+
+
+@app.post("/table/{id}")
+async def update_table(id, obj: PostData):
+    try:
+        owner = firebase_admin.auth.verify_id_token(obj.owner)['uid']
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=403, detail='Forbidden')
+    table = database.update_table(id, owner, obj.title, obj.main_data, obj.template)
+    if table:
+        return table
+    else:
+        raise HTTPException(status_code=403, detail='Forbidden')
