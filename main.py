@@ -10,6 +10,8 @@ from fastapi.responses import (
 from fastapi.middleware.cors import CORSMiddleware
 
 import firebase_admin
+import firebase_admin.auth
+import firebase_admin._auth_utils
 import database
 
 app = FastAPI()
@@ -56,3 +58,15 @@ async def get_table(id):
     if not table:
         raise HTTPException(status_code=404, detail='Not Found')
     return table
+
+
+@app.get("/user/{user_id}")
+async def get_user(user_id):
+    user = database.get_user(user_id)
+    try:
+        firebase_admin.auth.get_user(user_id)
+    except firebase_admin._auth_utils.UserNotFoundError:
+        if user:
+            database.delete_user(user_id)
+        raise HTTPException(status_code=404, detail='Not Found')
+    return user
