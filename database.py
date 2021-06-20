@@ -67,7 +67,7 @@ def update_table(id, owner, title='', main_data='', template=''):
         table.template = template
     table.updated_at = datetime.datetime.now()
     session.commit()
-    return
+    return table
 
 
 def delete_table(id, owner):
@@ -76,12 +76,17 @@ def delete_table(id, owner):
         if table.owner == owner:
             session.delete(table)
             session.commit()
-            return
+            return table
         else:
             return
+    else:
+        return
 
 
 def delete_user(user_id):
-    session.query(Data).filter(Data.owner == user_id).delete()
+    table = session.query(Data).filter(Data.owner == user_id)
+    if not table:
+        return
+    table.delete()
     session.commit()
-    return
+    return table
