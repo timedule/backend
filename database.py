@@ -45,7 +45,7 @@ def get_table(id):
             'title': table.title,
             'main_data': table.main_data,
             'template': table.template,
-            'updated_at': table.update_at,
+            'updated_at': table.updated_at,
         }
     else:
         return
@@ -57,6 +57,7 @@ def update_table(id, owner, title='', main_data='', template=''):
     table = session.query(Data).get(id)
     if not table:
         session.add(Data(id=id, owner=owner))
+        table = session.query(Data).get(id)
     if not table.owner == owner:
         return
     if title:
