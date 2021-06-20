@@ -57,6 +57,8 @@ def update_table(id, owner, title='', main_data='', template=''):
     table = session.query(Data).get(id)
     if not table:
         session.add(Data(id=id, owner=owner))
+    if not table.owner == owner:
+        return
     if title:
         table.title = title
     if main_data:
@@ -68,12 +70,15 @@ def update_table(id, owner, title='', main_data='', template=''):
     return
 
 
-def delete_table(id):
+def delete_table(id, owner):
     table = session.query(Data).get(id)
     if table:
-        session.delete(table)
-        session.commit()
-    return
+        if table.owner == owner:
+            session.delete(table)
+            session.commit()
+            return
+        else:
+            return
 
 
 def delete_user(user_id):
