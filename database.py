@@ -1,5 +1,6 @@
 import datetime
 import os
+import ast
 
 from sqlalchemy import Column, DateTime, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -43,8 +44,8 @@ def get_table(id):
         return {
             'owner': table.owner,
             'title': table.title,
-            'main_data': table.main_data,
-            'template': table.template,
+            'main_data': ast.literal_eval(table.main_data),
+            'template': ast.literal_eval(table.template),
             'updated_at': table.updated_at,
         }
     else:
@@ -61,11 +62,11 @@ def update_table(id, owner, title='', main_data='', template=''):
     if not table.owner == owner:
         return
     if title:
-        table.title = title
+        table.title = str(title)
     if main_data:
-        table.main_data = main_data
+        table.main_data = str(main_data)
     if template:
-        table.template = template
+        table.template = str(template)
     table.updated_at = datetime.datetime.now()
     session.commit()
     return table
