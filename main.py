@@ -25,6 +25,10 @@ class PostData(BaseModel):
     template: dict
 
 
+class UserData(BaseModel):
+    user_id: str
+
+
 app = FastAPI()
 
 
@@ -91,6 +95,20 @@ async def update_table(id, obj: PostData):
         print(e)
         raise HTTPException(status_code=403, detail='Forbidden')
     table = database.update_table(id, owner, obj.title, obj.main_data, obj.template)
+    if table:
+        return table
+    else:
+        raise HTTPException(status_code=403, detail='Forbidden')
+
+
+@app.post("/deltable/{id}")
+async def delete_table(id, user: UserData):
+    try:
+        user_id = firebase_admin.auth.verify_id_token(user.user_id)['uid']
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=403, detail='Forbidden')
+    table = database.delete_table(id, user_id)
     if table:
         return table
     else:
