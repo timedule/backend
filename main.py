@@ -113,3 +113,17 @@ async def delete_table(id, user: UserData):
         return table
     else:
         raise HTTPException(status_code=403, detail='Forbidden')
+
+
+@app.post("/deluser")
+async def delete_user(user: UserData):
+    try:
+        user_id = firebase_admin.auth.verify_id_token(user.user_id)['uid']
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=403, detail='Forbidden')
+    table = database.delete_user(user_id)
+    if table:
+        return table
+    else:
+        raise HTTPException(status_code=403, detail='Forbidden')
