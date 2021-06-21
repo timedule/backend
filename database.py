@@ -31,6 +31,7 @@ def get_user(user_id):
     for row in result:
         reslist.append(
             {
+                'id': row.id,
                 'title': row.title,
                 'updated_at': row.updated_at,
             }
