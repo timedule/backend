@@ -29,6 +29,12 @@ class UserData(BaseModel):
     user_id: str
 
 
+class CreateUser(BaseModel):
+    uid: str
+    email: str
+    password: str
+
+
 app = FastAPI()
 
 
@@ -121,9 +127,32 @@ async def delete_user(user: UserData):
         user_id = firebase_admin.auth.verify_id_token(user.user_id)['uid']
     except Exception as e:
         print(e)
-        raise HTTPException(status_code=403, detail='Forbidden')
+        raise HTTPException(status_code=403, detail='forbidden')
     table = database.delete_user(user_id)
     if table:
         return table
     else:
-        raise HTTPException(status_code=403, detail='Forbidden')
+        raise HTTPException(status_code=403, detail='forbidden')
+
+
+@app.post("/create_user")
+async def create_user(model: CreateUser):
+    try:
+        firebase_admin.auth.create_user(
+            uid=model.uid,
+            email=model.email,
+            password=model.password
+        )
+        res = ''
+    except firebase_admin._auth_utils.UidAlreadyExistsError:
+        res = 'UidAlreadyExists'
+    except firebase_admin._auth_utils.EmailAlreadyExistsError:
+        res = 'EmailAlreadyExists'
+    except Exception as e:
+        if str(e) == 'Error while calling Auth service (INVALID_EMAIL).':
+            res = 'InvalidEmail'
+        elif str(e) == 'Invalid password string. Password must be a string at least 6 characters long.':
+            res = 'WeakPassword'
+        else:
+            res = str(e)
+    return {'res': res}
