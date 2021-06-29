@@ -22,7 +22,7 @@ class PostData(BaseModel):
     owner: str
     title: str
     main_data: dict
-    template: dict
+    template: list
 
 
 class UserData(BaseModel):
