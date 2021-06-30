@@ -42,11 +42,19 @@ def get_user(user_id):
 def get_table(id):
     table = session.query(Data).get(id)
     if table:
+        if table.main_data:
+            main_data = ast.literal_eval(table.main_data)
+        else:
+            main_data = {}
+        if table.template:
+            template = ast.literal_eval(table.template)
+        else:
+            template = []
         return {
             'owner': table.owner,
             'title': table.title,
-            'main_data': ast.literal_eval(table.main_data),
-            'template': ast.literal_eval(table.template),
+            'main_data': main_data,
+            'template': template,
             'updated_at': table.updated_at,
         }
     else:
